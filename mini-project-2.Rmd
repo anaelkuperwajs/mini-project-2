@@ -20,9 +20,34 @@ output:
 
 ```{r}
 buzzfeed <- read.csv("https://www.macalester.edu/~ajohns24/data/buzzfeed.csv")
+
+buzzfeed <- buzzfeed %>% 
+  mutate(title = as.character(title),
+         text = as.character(text),
+         url = as.character(url))
 ```
 
 
+
+### New predictors
+
+Our new predictors will be:
+
+1. Lexical density
+2. Flesch–Kincaid grade level
+3. Primary sentiment
+4. Secondary sentiment
+5. ! ratio (to . ?)
+6. Author
+7. Date
+8. Word count
+9. Sentence Count
+10. Syllables
+11. Location
+12. News Source
+13. Strength of primary sentiment
+14. Strength of secondary sentiment
+15. Count of upper-case words
 
 
 \
