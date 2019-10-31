@@ -1,0 +1,60 @@
+---
+title: "Mini-Project 2: Adventure 1"
+author: Anael Kuperwajs Cohen, Juliet Kelson
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+
+
+
+\
+\
+
+
+
+## Part 1: Process the data
+
+
+\
+\
+\
+\
+\
+\
+
+
+
+## Part 2: Analyze
+
+
+\
+\
+\
+\
+\
+\
+
+
+
+## Part 3: Summarize
+
+
+
+
+\
+\
+\
+\
+\
+\
+
+
+
+## Part 4: Contributions
+
+
+
