@@ -9,6 +9,12 @@ output:
 ---
 
 
+```{r}
+library(dplyr)
+library(ggplot2)
+library(caret)
+library(stringr)
+```
 
 
 \
@@ -33,14 +39,14 @@ buzzfeed <- buzzfeed %>%
 
 Our new predictors will be:
 
-1. Lexical density
+1. Lexical density (unique words/total words)
 2. Flesch–Kincaid grade level
 3. Primary sentiment
 4. Secondary sentiment
 5. ! ratio (to . ?)
 6. Author
 7. Date
-8. Word count
+8. Word count √
 9. Sentence Count
 10. Syllables
 11. Location
@@ -48,6 +54,11 @@ Our new predictors will be:
 13. Strength of primary sentiment
 14. Strength of secondary sentiment
 15. Count of upper-case words
+
+```{r}
+buzzfeed <- buzzfeed %>% 
+  mutate(total_words = str_count(text, " ") + 1)
+```
 
 
 \
