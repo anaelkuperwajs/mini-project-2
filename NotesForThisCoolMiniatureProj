@@ -1,0 +1,30 @@
+Maybe we can have some ideas?
+
+An idea or five that we can have: 
+
+- Lexical density https://en.wikipedia.org/wiki/Lexical_density
+- Reading grade level https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests
+- Sentiment analysis
+- Punctuation?
+- Named Entity Recognition (author, date, location, source)
+
+- Text mining with R Julia Silge
+
+
+15 new predictors:
+
+1. Lexical density
+2. Flesch–Kincaid grade level
+3. Primary sentiment
+4. Secondary sentiment
+5. ! ratio (to . ?)
+6. Author
+7. Date
+8. Word count
+9. Sentence Count
+10. Syllables
+11. Location
+12. News Source
+13. Strength of primary sentiment
+14. Strength of secondary sentiment
+15. Count of upper-case words
