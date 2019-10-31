@@ -18,6 +18,12 @@ output:
 
 ## Part 1: Process the data
 
+```{r}
+buzzfeed <- read.csv("https://www.macalester.edu/~ajohns24/data/buzzfeed.csv")
+```
+
+
+
 
 \
 \
@@ -55,6 +61,4 @@ output:
 
 
 ## Part 4: Contributions
-
-Juliet did all of the work.
 
