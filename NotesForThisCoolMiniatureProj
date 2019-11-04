@@ -19,7 +19,7 @@ An idea or five that we can have:
 [ ] 4. Secondary sentiment
 [ ] 5. ! ratio (to . ?)
 [ ] 6. Author
-[ ] 7. Date
+[ ] 7. Date - don't know if this works
 [x] 8. Word count
 [ ] 9. Sentence Count
 [ ] 10. Syllables
@@ -27,4 +27,4 @@ An idea or five that we can have:
 [ ] 12. News Source
 [ ] 13. Strength of primary sentiment
 [ ] 14. Strength of secondary sentiment
-[ ] 15. Count of upper-case words
+[x] 15. Count of upper-case words

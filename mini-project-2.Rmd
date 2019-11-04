@@ -14,6 +14,7 @@ library(dplyr)
 library(ggplot2)
 library(caret)
 library(stringr)
+library(tidyverse)
 ```
 
 
@@ -46,7 +47,7 @@ Our new predictors will be:
 5. ! ratio (to . ?)
 6. Author
 7. Date
-8. Word count √
+8. Word count
 9. Sentence Count
 10. Syllables
 11. Location
@@ -55,9 +56,23 @@ Our new predictors will be:
 14. Strength of secondary sentiment
 15. Count of upper-case words
 
+8.
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(total_words = str_count(text, " ") + 1)
+```
+
+15.
+```{r}
+buzzfeed <- buzzfeed %>% 
+  mutate(total_upper_case_words = str_count(text, "\\b[A-Z]{2,}\\b"))
+```
+
+6.
+```{r}
+buzzfeed <- buzzfeed %>% 
+  gather() %>% 
+  spread()
 ```
 
 
