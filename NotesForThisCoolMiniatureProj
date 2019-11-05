@@ -17,14 +17,14 @@ An idea or five that we can have:
 [x] 2. Flesch–Kincaid grade level
 [ ] 3. Primary sentiment
 [ ] 4. Secondary sentiment
-[ ] 5. ! ratio (to . ?)
+[x] 5. ! ratio (to . ?)
 [x] 6. Author Count
-[ ] 7.
+[ ] 7. ! ratio (to . ?) in title
 [x] 8. Word count
 [x] 9. Sentence Count
 [x] 10. Syllables
-[ ] 11.
-[ ] 12. News Source
+[x] 11. Upper-case word count in title
+[x] 12. Word count in title
 [ ] 13. Strength of primary sentiment
 [ ] 14. Strength of secondary sentiment
-[x] 15. Count of upper-case words
+[x] 15. Upper-case word count

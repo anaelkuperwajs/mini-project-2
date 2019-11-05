@@ -16,6 +16,7 @@ library(caret)
 library(stringr)
 library(tidyverse)
 library(quanteda)
+source("miniProjFunctions.R")
 ```
 
 
@@ -43,26 +44,46 @@ buzzfeed <- buzzfeed %>%
 
 Our new predictors will be:
 
-1. Lexical density (unique words/total words)
-2. Flesch–Kincaid grade level
-3. Primary sentiment
-4. Secondary sentiment
-5. ! ratio (to . ?)
-6. Author Count
-7. 
-8. Word count
-9. Sentence Count
-10. Syllables
-11.
-12. News Source
-13. Strength of primary sentiment
-14. Strength of secondary sentiment
-15. Count of upper-case words
+[x] 1. % Unique words
+[x] 2. Flesch–Kincaid grade level
+[ ] 3. Primary sentiment
+[ ] 4. Secondary sentiment
+[x] 5. ! ratio (to . ?)
+[x] 6. Author Count
+[ ] 7. ! ratio (to . ?) in title
+[x] 8. Word count
+[x] 9. Sentence Count
+[x] 10. Syllables
+[x] 11. Upper-case word count in title
+[x] 12. Word count in title
+[ ] 13. Strength of primary sentiment
+[ ] 14. Strength of secondary sentiment
+[x] 15. Upper-case word count
+
+
+5.
+```{r}
+buzzfeed %>% 
+  mutate(exclamation_ratio = exclamation_ratio(text))
+```
+
 
 8.
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(total_words = str_count(text, " ") + 1)
+```
+
+12.
+```{r}
+buzzfeed <- buzzfeed %>% 
+  mutate(total_words_title = str_count(title, " ") + 1)
+```
+
+1.
+```{r}
+buzzfeed <- buzzfeed %>% 
+  mutate(unique_word_percent = pct_unique_words(text, total_words))
 ```
 
 15.
@@ -71,24 +92,37 @@ buzzfeed <- buzzfeed %>%
   mutate(total_upper_case_words = str_count(text, "\\b[A-Z]{2,}\\b"))
 ```
 
-6. FIX THIS
+11.
+```{r}
+buzzfeed <- buzzfeed %>% 
+  mutate(total_upper_case_words_title = str_count(title, "\\b[A-Z]{2,}\\b"))
+```
+
+6.
 ```{r}
 buzzfeed <- buzzfeed %>%
-  mutate(authors = gsub("View All Posts,", "", authors)) %>% 
-  # Abc News,", "Cnn National Politics Reporter,", "Cnn Pentagon Correspondent,", "Latest Posts,", "Cnn White House Producer,", "Cnn Senior Congressional Producer,"), "", authors)) %>% 
+  mutate(authors = gsub("View All Posts,", "", authors)) %>%
+  mutate(authors = gsub("View All Posts", "", authors)) %>%
+  mutate(authors = gsub("Abc News,", "", authors)) %>%
+  mutate(authors = gsub("Abc News", "", authors)) %>%
+  mutate(authors = gsub("Cnn National Politics Reporter,", "", authors)) %>%
+  mutate(authors = gsub("Cnn National Politics Reporter", "", authors)) %>%
+  mutate(authors = gsub("Cnn Pentagon Correspondent,", "", authors)) %>%
+  mutate(authors = gsub("Cnn Pentagon Correspondent", "", authors)) %>%
+  mutate(authors = gsub("Latest Posts,", "", authors)) %>%
+  mutate(authors = gsub("Latest Posts", "", authors)) %>%
+  mutate(authors = gsub("Cnn White House Producer,", "", authors)) %>%
+  mutate(authors = gsub("Cnn White House Producer", "", authors)) %>%
+  mutate(authors = gsub("Cnn Senior Congressional Producer,", "", authors)) %>%
+  mutate(authors = gsub("Cnn Senior Congressional Producer", "", authors)) %>%
   mutate(author_count = str_count(authors, ",") + 1) %>% 
   mutate(author_count = if_else(author_count == 0, 1, author_count))
 ```
 
-Trying to get rid of wrong authors:
-buzzfeed <- buzzfeed %>% 
-  filter(author %!in% c("View All Posts", "Abc News", "Cnn National Politics Reporter", "Cnn Pentagon Correspondent", "Latest Posts", "Cnn White House Producer", "Cnn Senior Congressional Producer"))
-
-
 10.
 ```{r}
 buzzfeed <- buzzfeed %>% 
-  mutate(syllables = nsyllable(text))
+  mutate(total_syllables = nsyllable(text))
 ```
 
 9.
@@ -97,6 +131,11 @@ buzzfeed <- buzzfeed %>%
   mutate(total_sentences = nsentence(text))
 ```
 
+2.
+```{r}
+buzzfeed <- buzzfeed %>% 
+  mutate(readability_score = flesch_reading_ease(total_words, total_sentences, total_syllables))
+```
 
 \
 \
