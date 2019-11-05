@@ -15,6 +15,7 @@ library(ggplot2)
 library(caret)
 library(stringr)
 library(tidyverse)
+library(quanteda)
 ```
 
 
@@ -32,6 +33,8 @@ buzzfeed <- buzzfeed %>%
   mutate(title = as.character(title),
          text = as.character(text),
          url = as.character(url))
+
+'%!in%' <- function(x, y)!('%in%'(x,y))
 ```
 
 
@@ -45,12 +48,12 @@ Our new predictors will be:
 3. Primary sentiment
 4. Secondary sentiment
 5. ! ratio (to . ?)
-6. Author
-7. Date
+6. Author Count
+7. 
 8. Word count
 9. Sentence Count
 10. Syllables
-11. Location
+11.
 12. News Source
 13. Strength of primary sentiment
 14. Strength of secondary sentiment
@@ -68,11 +71,30 @@ buzzfeed <- buzzfeed %>%
   mutate(total_upper_case_words = str_count(text, "\\b[A-Z]{2,}\\b"))
 ```
 
-6.
+6. FIX THIS
+```{r}
+buzzfeed <- buzzfeed %>%
+  mutate(authors = gsub("View All Posts,", "", authors)) %>% 
+  # Abc News,", "Cnn National Politics Reporter,", "Cnn Pentagon Correspondent,", "Latest Posts,", "Cnn White House Producer,", "Cnn Senior Congressional Producer,"), "", authors)) %>% 
+  mutate(author_count = str_count(authors, ",") + 1) %>% 
+  mutate(author_count = if_else(author_count == 0, 1, author_count))
+```
+
+Trying to get rid of wrong authors:
+buzzfeed <- buzzfeed %>% 
+  filter(author %!in% c("View All Posts", "Abc News", "Cnn National Politics Reporter", "Cnn Pentagon Correspondent", "Latest Posts", "Cnn White House Producer", "Cnn Senior Congressional Producer"))
+
+
+10.
 ```{r}
 buzzfeed <- buzzfeed %>% 
-  gather() %>% 
-  spread()
+  mutate(syllables = nsyllable(text))
+```
+
+9.
+```{r}
+buzzfeed <- buzzfeed %>% 
+  mutate(total_sentences = nsentence(text))
 ```
 
 

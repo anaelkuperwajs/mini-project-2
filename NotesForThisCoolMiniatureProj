@@ -13,17 +13,17 @@ An idea or five that we can have:
 
 15 new predictors:
 
-[ ] 1. Lexical density
-[ ] 2. Flesch–Kincaid grade level
+[x] 1. % Unique words
+[x] 2. Flesch–Kincaid grade level
 [ ] 3. Primary sentiment
 [ ] 4. Secondary sentiment
 [ ] 5. ! ratio (to . ?)
-[ ] 6. Author
-[ ] 7. Date - don't know if this works
+[x] 6. Author Count
+[ ] 7.
 [x] 8. Word count
-[ ] 9. Sentence Count
-[ ] 10. Syllables
-[ ] 11. Location
+[x] 9. Sentence Count
+[x] 10. Syllables
+[ ] 11.
 [ ] 12. News Source
 [ ] 13. Strength of primary sentiment
 [ ] 14. Strength of secondary sentiment
