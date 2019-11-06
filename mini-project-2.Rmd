@@ -50,7 +50,7 @@ Our new predictors will be:
 [ ] 4. Secondary sentiment
 [x] 5. ! ratio (to . ?)
 [x] 6. Author Count
-[ ] 7. ! ratio (to . ?) in title
+[x] 7. ! ratio (to . ?) in title
 [x] 8. Word count
 [x] 9. Sentence Count
 [x] 10. Syllables
@@ -63,10 +63,15 @@ Our new predictors will be:
 
 5.
 ```{r}
-buzzfeed %>% 
+buzzfeed <- buzzfeed %>% 
   mutate(exclamation_ratio = exclamation_ratio(text))
 ```
 
+7.
+```{r}
+buzzfeed <- buzzfeed %>% 
+  mutate(exclamation_ratio_title = exclamation_ratio(title))
+```
 
 8.
 ```{r}
@@ -116,7 +121,8 @@ buzzfeed <- buzzfeed %>%
   mutate(authors = gsub("Cnn Senior Congressional Producer,", "", authors)) %>%
   mutate(authors = gsub("Cnn Senior Congressional Producer", "", authors)) %>%
   mutate(author_count = str_count(authors, ",") + 1) %>% 
-  mutate(author_count = if_else(author_count == 0, 1, author_count))
+  mutate(author_count = if_else(author_count == 0, 1, author_count)) %>% 
+  mutate(authors = if_else(authors == "", "None", authors))
 ```
 
 10.
