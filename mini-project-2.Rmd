@@ -147,6 +147,7 @@ buzzfeed <- buzzfeed %>%
 3.
 ```{r}
 buzzfeed <- buzzfeed %>% 
+  rowwise() %>% 
   mutate(primary_sentiment = max_sentiment_type(text),
          primary_sentiment_value = max_sentiment_value(text))
 ```
