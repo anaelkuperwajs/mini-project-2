@@ -47,7 +47,7 @@ Our new predictors will be:
 
 [x] 1. % Unique words
 [x] 2. Flesch–Kincaid grade level
-[ ] 3. Primary sentiment
+[x] 3. Primary sentiment
 [ ] 4. Secondary sentiment
 [x] 5. ! ratio (to . ?)
 [x] 6. Author Count
@@ -57,8 +57,8 @@ Our new predictors will be:
 [x] 10. Syllables
 [x] 11. Upper-case word count in title
 [x] 12. Word count in title
-[ ] 13. Strength of primary sentiment
-[ ] 14. Strength of secondary sentiment
+[x] 13. Strength of primary sentiment
+[x] 14. Strength of secondary sentiment
 [x] 15. Upper-case word count
 
 
@@ -148,8 +148,11 @@ buzzfeed <- buzzfeed %>%
 ```{r}
 buzzfeed <- buzzfeed %>% 
   rowwise() %>% 
-  mutate(primary_sentiment = max_sentiment_type(text),
-         primary_sentiment_value = max_sentiment_value(text))
+  mutate(primary_sentiment = max_sentiment_type(text, 1),
+         primary_sentiment_value = max_sentiment_value(text, 1),
+         secondary_sentiment = max_sentiment_type(text, 2),
+         secondary_sentiment_value = max_sentiment_value(text, 2)
+         )
 ```
 
 
