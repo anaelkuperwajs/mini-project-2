@@ -18,7 +18,7 @@ flesch_reading_ease <- function(nwords, nsentences, nsyllables){
 #' @return number of unique words
 pct_unique_words <- function(text, nwords){
   unique = length(unique(unlist(str_split(text, ' '))))
-  pct_unique = round((unique/nwords), 2)
+  pct_unique = round(unique/nwords, 2)
   
   return(pct_unique)
 }
@@ -58,7 +58,7 @@ max_sentiment_value <- function(text, n){
   sentiment_vec = c(anger, anticipation, disgust, fear, joy, sadness, surprise, trust, negative, positive)
   n_largest = sort(sentiment_vec, decreasing=T)[n]
   
-  return(n_largest/length(sentences_vector))
+  return(round(n_largest/sum(sentiment), 2)*100)
 }
 
 #' max_sentiment_type

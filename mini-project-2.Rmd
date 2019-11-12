@@ -60,6 +60,7 @@ Our new predictors will be:
 [x] 13. Strength of primary sentiment
 [x] 14. Strength of secondary sentiment
 [x] 15. Author Count
+[x] 16. Upper-case word ratio in title
 
 
 1. Word Count
@@ -81,9 +82,11 @@ buzzfeed <- buzzfeed %>%
 ```
 
 4. Upper-case word count in title
+16. Upper-case word ratio in title
 ```{r}
 buzzfeed <- buzzfeed %>% 
-  mutate(total_upper_case_words_title = str_count(title, "\\b[A-Z]{2,}\\b"))
+  mutate(total_upper_case_words_title = str_count(title, "\\b[A-Z]{2,}\\b"),
+         upper_case_word_ratio_title = total_upper_case_words_title/total_words_title)
 ```
 
 5. ! ratio (to . ?)
@@ -155,7 +158,8 @@ buzzfeed <- buzzfeed %>%
   mutate(authors = gsub("Cnn Senior Congressional Producer", "", authors)) %>%
   mutate(author_count = str_count(authors, ",") + 1) %>% 
   mutate(author_count = if_else(author_count == 0, 1, author_count)) %>% 
-  mutate(authors = if_else(authors == "", "None", authors))
+  mutate(authors = if_else(authors == "", "None", authors)) %>% 
+  mutate(author_count = if_else(authors == "None", 0, author_count))
 ```
 
 
@@ -165,10 +169,11 @@ To demonstrate and summarize the definitions of your new predictors, discuss the
 buzzfeed[c(8,153),]
 ```
 
-The two sources that will be presented in order to demonstrate our new predictors include "Jeb Bush to lecture at Harvard this fall", the real sample article, and "Hillary's DEAD!?!? Brand New Theory Has Serious PROOF", which is the fake article. 
-We first started by looking at predictors relating to word and punctuation counts in the text itself and the title. Our first predictors looked at the word count and upper-case word count in the text and the title. The total number of words for the title and the text were not greatly different between these two articles. The number of words in the title is exactly the same and the word count in the text is greater for the fake article, but only by 50 words. The total number of upper-case words in the text is also similar in both articles, one in the real article and two in the fake, however the difference in the number of upper-case words is more drastic in the title. There are zero upper-case words in the real title and two in the fake article, which is out of eight total words in the title. The next two predictors looked at the ratio of exclamation points to question marks and periods in the text and title. In the text, there are zero exclamation points in real article, yet about 47% in the fake article. Furthermore, in the title there are also zero exclamation points in the real article and 50% in the fake article. This shows that exclamation points are used way more freely in the fake article, rather than the real article.
+The two sources that will be presented in order to demonstrate our new predictors include "Jeb Bush to lecture at Harvard this fall" -- the real sample article -- and "Hillary's DEAD!?!? Brand New Theory Has Serious PROOF" --  the fake article. 
+We first started by looking at predictors relating to word and punctuation counts in the text itself and the title. Our first predictors looked at the word count and upper-case word count in the text and the title. The total number of words for the title and the text were not greatly different between these two articles. The number of words in the title is exactly the same and the word count in the text is greater for the fake article, but only by 50 words. The total number of upper-case words in the text is also similar in both articles, one in the real article and two in the fake, however the difference in the number of upper-case words is more drastic in the title. There are zero upper-case words in the real title and two in the fake article, which is out of eight total words in the title. The next two predictors looked at the ratio of exclamation points to question marks and periods in the text and title. In the text, there are zero exclamation points in real article, yet about 47% in the fake article. Furthermore, in the title there are zero exclamation points in the real article but they make up 50% of the punctuation in the fake article. This shows that exclamation points are used way more freely in the fake article, rather than the real article.
 
-Discuss potential drawbacks of text analysis.
+There are of course drawbacks to text analysis. For example, let's look at sentiment analysis.  We will not always be able to accurately analyze the sentiment of text.  Computers and algorithms can't always detect sarcasm, understand references or allusions, and won't always correctly analyze basic sentiments such as `positive` or `negative`.
+Additionally, writing algorithms to detect factors like writing style, words with multiple meanings, correct grammar/puntuation, and correctness of fact is often difficult, innacurate, or impossible.  All of that being said, text analysis is still a good and important research tool.
 
 
 \
@@ -181,6 +186,107 @@ Discuss potential drawbacks of text analysis.
 
 
 ## Part 2: Analyze
+
+When training our model, we don't want to include `text`, `title`, or `url` because they are unique to each article and therefore will not make good predictors.
+
+```{r}
+#Doesn't seem to be a good predictor
+buzzfeed %>% 
+  ggplot(aes(x=primary_sentiment_value, fill = type, alpha = 0.5))+
+  geom_density()+
+  facet_wrap(~primary_sentiment)+
+  xlim(0,60)
+
+buzzfeed %>% 
+  ggplot(aes(x=secondary_sentiment_value, fill = type, alpha = 0.5))+
+  geom_density()+
+  facet_wrap(~secondary_sentiment)+
+  xlim(0,60)
+
+buzzfeed %>% 
+  ggplot(aes(x=readability_score, fill=type, alpha=0.5))+
+  geom_density()
+
+buzzfeed %>% 
+  ggplot(aes(x=unique_word_percent, fill=type, alpha=0.5))+
+  geom_density()
+
+buzzfeed %>% 
+  ggplot(aes(x=exclamation_ratio, fill=type, alpha=0.5))+
+  geom_density()
+
+buzzfeed %>% 
+  ggplot(aes(x=exclamation_ratio_title, fill=type, alpha=0.5))+
+  geom_density()
+
+buzzfeed %>% 
+  ggplot(aes(x=author_count, fill=type, alpha=0.5))+
+  geom_density()
+```
+
+
+```{r}
+# Pretty good 
+set.seed(253)
+lambda_grid <- 10^seq(-3, 1, length = 100)
+
+# Perform LASSO
+lasso_model <- train(
+    type ~ .,
+    data = buzzfeed %>% select(-text, -title, -url),
+    method = "glmnet",
+    tuneGrid = data.frame(alpha = 1, lambda = lambda_grid),
+    trControl = trainControl(method = "cv", number = 10, selectionFunction = "best"),
+    metric = "MAE",
+    na.action = na.omit
+)
+
+lasso_model$results %>% filter(lambda == lasso_model$bestTune$lambda)
+
+coef(lasso_model$finalModel, lasso_model$bestTune$lambda)
+
+```
+
+
+```{r}
+# GAM doesn't like the source or url because of the backslashes
+
+gam_model <- train(
+  type ~ .,
+  data = buzzfeed %>% select(-text, -title, -url, -source),
+  method = "gamLoess",
+  tuneGrid = data.frame(span = seq(0.2, 0.6, 0.1), degree = 1),
+  trControl = trainControl(method = "cv", number = 10, selectionFunction = "oneSE"),
+  metric = "Accuracy",
+  na.action = na.omit
+)
+
+plot(gam_model)
+gam_model$resample
+```
+
+
+```{r}
+#Not great and hard to use
+
+# Set the seed
+set.seed(253)
+
+# Run the model
+# using variables chosen from lasso
+logistic_model <- train(
+    type ~ .,
+    data = buzzfeed %>% select(authors, source, exclamation_ratio_title, type, primary_sentiment, secondary_sentiment),
+    method = "glm",
+    family = "binomial",
+    trControl = trainControl(method = "cv", number = 10),
+    metric = "Accuracy",
+    na.action = na.omit
+)
+
+# Summarize the model
+logistic_model$results
+```
 
 
 \
@@ -204,7 +310,19 @@ Discuss potential drawbacks of text analysis.
 \
 \
 
+## Appendix
 
+
+
+
+
+
+\
+\
+\
+\
+\
+\
 
 ## Part 4: Contributions
 
