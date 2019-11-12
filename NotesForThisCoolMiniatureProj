@@ -13,18 +13,18 @@ An idea or five that we can have:
 
 15 new predictors:
 
-[x] 1. % Unique words
-[x] 2. Flesch–Kincaid grade level
-[ ] 3. Primary sentiment
-[ ] 4. Secondary sentiment
+[x] 1. Word count
+[x] 2. Word count in title
+[x] 3. Upper-case word count
+[x] 4. Upper-case word count in title
 [x] 5. ! ratio (to . ?)
-[x] 6. Author Count
-[x] 7. ! ratio (to . ?) in title
-[x] 8. Word count
-[x] 9. Sentence Count
-[x] 10. Syllables
-[x] 11. Upper-case word count in title
-[x] 12. Word count in title
-[ ] 13. Strength of primary sentiment
-[ ] 14. Strength of secondary sentiment
-[x] 15. Upper-case word count
+[x] 6. ! ratio (to . ?) in title
+[x] 7. Sentence Count
+[x] 8. Syllables
+[x] 9. % Unique words
+[x] 10. Flesch–Kincaid grade level
+[x] 11. Primary sentiment
+[x] 12. Secondary sentiment
+[x] 13. Strength of primary sentiment
+[x] 14. Strength of secondary sentiment
+[x] 15. Author Count
