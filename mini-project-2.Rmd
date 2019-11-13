@@ -49,18 +49,18 @@ Our new predictors will be:
 [x] 2. Word count in title
 [x] 3. Upper-case word count
 [x] 4. Upper-case word count in title
-[x] 5. ! ratio (to . ?)
-[x] 6. ! ratio (to . ?) in title
-[x] 7. Sentence Count
-[x] 8. Syllables
-[x] 9. % Unique words
-[x] 10. Flesch–Kincaid grade level
-[x] 11. Primary sentiment
-[x] 12. Secondary sentiment
-[x] 13. Strength of primary sentiment
-[x] 14. Strength of secondary sentiment
-[x] 15. Author Count
-[x] 16. Upper-case word ratio in title
+[x] 5. Upper-case word ratio in title
+[x] 6. ! ratio (to . ?)
+[x] 7. ! ratio (to . ?) in title
+[x] 8. Sentence Count
+[x] 9. Syllables
+[x] 10. % Unique words
+[x] 11. Flesch–Kincaid grade level
+[x] 12. Author Count
+[x] 13. Primary sentiment
+[x] 14. Secondary sentiment
+[x] 15. Strength of primary sentiment
+[x] 16. Strength of secondary sentiment
 
 
 1. Word Count
@@ -82,64 +82,50 @@ buzzfeed <- buzzfeed %>%
 ```
 
 4. Upper-case word count in title
-16. Upper-case word ratio in title
+5. Upper-case word ratio in title
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(total_upper_case_words_title = str_count(title, "\\b[A-Z]{2,}\\b"),
          upper_case_word_ratio_title = total_upper_case_words_title/total_words_title)
 ```
 
-5. ! ratio (to . ?)
+6. ! ratio (to . ?)
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(exclamation_ratio = exclamation_ratio(text))
 ```
 
-6. ! ratio (to . ?) in title
+7. ! ratio (to . ?) in title
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(exclamation_ratio_title = exclamation_ratio(title))
 ```
 
-7. Sentence Count
+8. Sentence Count
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(total_sentences = nsentence(text))
 ```
 
-8. Syllables
+9. Syllables
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(total_syllables = nsyllable(text))
 ```
 
-9. % Unique words
+10. % Unique words
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(unique_word_percent = pct_unique_words(text, total_words))
 ```
 
-10. Flesch–Kincaid grade level
+11. Flesch–Kincaid grade level
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(readability_score = flesch_reading_ease(total_words, total_sentences, total_syllables))
 ```
 
-11. Primary sentiment
-12. Secondary sentiment
-13. Strength of primary sentiment
-14. Strength of secondary sentiment
-```{r}
-buzzfeed <- buzzfeed %>% 
-  rowwise() %>% 
-  mutate(primary_sentiment = max_sentiment_type(text, 1),
-         primary_sentiment_value = max_sentiment_value(text, 1),
-         secondary_sentiment = max_sentiment_type(text, 2),
-         secondary_sentiment_value = max_sentiment_value(text, 2)
-         )
-```
-
-6.
+12. Author Count
 ```{r}
 buzzfeed <- buzzfeed %>%
   mutate(authors = gsub("View All Posts,", "", authors)) %>%
@@ -162,6 +148,20 @@ buzzfeed <- buzzfeed %>%
   mutate(author_count = if_else(authors == "None", 0, author_count))
 ```
 
+13. Primary sentiment
+14. Secondary sentiment
+15. Strength of primary sentiment
+16. Strength of secondary sentiment
+```{r}
+buzzfeed <- buzzfeed %>% 
+  rowwise() %>% 
+  mutate(primary_sentiment = max_sentiment_type(text, 1),
+         primary_sentiment_value = max_sentiment_value(text, 1),
+         secondary_sentiment = max_sentiment_type(text, 2),
+         secondary_sentiment_value = max_sentiment_value(text, 2)
+         )
+```
+
 
 To demonstrate and summarize the definitions of your new predictors, discuss their measurements for one real sample article and one fake sample article of your choosing.
 
@@ -170,10 +170,9 @@ buzzfeed[c(8,153),]
 ```
 
 The two sources that will be presented in order to demonstrate our new predictors include "Jeb Bush to lecture at Harvard this fall" -- the real sample article -- and "Hillary's DEAD!?!? Brand New Theory Has Serious PROOF" --  the fake article. 
-We first started by looking at predictors relating to word and punctuation counts in the text itself and the title. Our first predictors looked at the word count and upper-case word count in the text and the title. The total number of words for the title and the text were not greatly different between these two articles. The number of words in the title is exactly the same and the word count in the text is greater for the fake article, but only by 50 words. The total number of upper-case words in the text is also similar in both articles, one in the real article and two in the fake, however the difference in the number of upper-case words is more drastic in the title. There are zero upper-case words in the real title and two in the fake article, which is out of eight total words in the title. The next two predictors looked at the ratio of exclamation points to question marks and periods in the text and title. In the text, there are zero exclamation points in real article, yet about 47% in the fake article. Furthermore, in the title there are zero exclamation points in the real article but they make up 50% of the punctuation in the fake article. This shows that exclamation points are used way more freely in the fake article, rather than the real article.
+We first started by looking at predictors relating to word and punctuation counts in the text itself and the title. Our first predictors looked at the word count and upper-case word count in the text and the title. The total number of words for the title and the text were not significantly different between these two articles. The number of words in the title is exactly the same and the word count in the text is greater for the fake article, but only by 50 words. The total number of upper-case words in the text is also similar in both articles, one in the real article and two in the fake, however the difference in the number of upper-case words is more drastic in the title. There are zero upper-case words in the real title and two in the fake article, which is out of eight total words in the title. Two out of eight words is 25%, as seen in the ratio predictor for upper-case words in the title. The next two predictors looked at the ratio of exclamation points to question marks and periods in the text and title. In the text, there are zero exclamation points in real article, yet about 47% in the fake article. Furthermore, in the title there are zero exclamation points in the real article but they make up 50% of the punctuation in the fake article. This shows that exclamation points are used way more freely in the fake article, rather than the real article. Just like word count, we also looked at sentence and syllable count. These two measurements were fairly insignificant as the numbers were similar in both sentences. It was slightly surprising, however, that there were more sentences and syllables in the fake news article than the real one. The next two predictors analyzed the words that were used in the text. The first is the percent of unique words, which was much higher for the real article, 112.75% vs 87.10%. The second is a readability score, where the higher the percent the easier the text is to read because it is meant for a younger audience. The real article has a readability score of 23.34, which matches with a school reading level of a college graduate. On the other hand, the fake article has a score of 48.71, which aligns with a school reading level of a college student. While this may not seem like a huge difference, the idea is that the structure of the article is much more complex the lower the score. Fake articles often don't have that same complexity. The next predictor is about the author count, which is equal in this case between the two articles with one author. It does not make a big difference in this comparison. Finally, the last four predictors are about sentiment analysis. We looked at the primary and secondary sentiment in the text and the strength of that sentiment. The sentiments for the real article are trust and positive, with scores in the 30s, while the fake article has the sentiments negative and positive with low scores of 16 each. The fact that the primary and secondary sentiments conflict with each other greatly is something to be concerned about when thinking of the validity of an article.
 
-There are of course drawbacks to text analysis. For example, let's look at sentiment analysis.  We will not always be able to accurately analyze the sentiment of text.  Computers and algorithms can't always detect sarcasm, understand references or allusions, and won't always correctly analyze basic sentiments such as `positive` or `negative`.
-Additionally, writing algorithms to detect factors like writing style, words with multiple meanings, correct grammar/puntuation, and correctness of fact is often difficult, innacurate, or impossible.  All of that being said, text analysis is still a good and important research tool.
+Similar to any analytical method, text analysis has it's drawbacks. One drawback, for example, is seen clearly through the sentiment analysis predictors. We will not always be able to accurately analyze the sentiment of text. Computers and algorithms can't always detect sarcasm, understand references or allusions, and won't always correctly analyze basic sentiments such as `positive` or `negative`. Additionally, writing algorithms to detect factors like writing style, words with multiple meanings, correct grammar/puntuation, and correctness of fact is often difficult, innacurate, or impossible.  All of that being said, text analysis is still a beneficial and important research tool.
 
 
 \

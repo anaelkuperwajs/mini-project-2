@@ -11,20 +11,21 @@ An idea or five that we can have:
 - Text mining with R Julia Silge
 
 
-15 new predictors:
+16 new predictors:
 
 [x] 1. Word count
 [x] 2. Word count in title
 [x] 3. Upper-case word count
 [x] 4. Upper-case word count in title
-[x] 5. ! ratio (to . ?)
-[x] 6. ! ratio (to . ?) in title
-[x] 7. Sentence Count
-[x] 8. Syllables
-[x] 9. % Unique words
-[x] 10. Flesch–Kincaid grade level
-[x] 11. Primary sentiment
-[x] 12. Secondary sentiment
-[x] 13. Strength of primary sentiment
-[x] 14. Strength of secondary sentiment
-[x] 15. Author Count
+[x] 5. Upper-case word ratio in title
+[x] 6. ! ratio (to . ?)
+[x] 7. ! ratio (to . ?) in title
+[x] 8. Sentence Count
+[x] 9. Syllables
+[x] 10. % Unique words
+[x] 11. Flesch–Kincaid grade level
+[x] 12. Author Count
+[x] 13. Primary sentiment
+[x] 14. Secondary sentiment
+[x] 15. Strength of primary sentiment
+[x] 16. Strength of secondary sentiment
