@@ -35,7 +35,6 @@ buzzfeed <- buzzfeed %>%
   mutate(title = as.character(title),
          text = as.character(text),
          url = as.character(url))
-
 ```
 
 
@@ -151,7 +150,7 @@ buzzfeed <- buzzfeed %>%
 14. Secondary sentiment
 15. Strength of primary sentiment
 16. Strength of secondary sentiment
-```{r}
+```{r cache=TRUE}
 buzzfeed <- buzzfeed %>% 
   rowwise() %>% 
   mutate(primary_sentiment = max_sentiment_type(text, 1),
@@ -160,9 +159,6 @@ buzzfeed <- buzzfeed %>%
          secondary_sentiment_value = max_sentiment_value(text, 2)
          )
 ```
-
-
-To demonstrate and summarize the definitions of your new predictors, discuss their measurements for one real sample article and one fake sample article of your choosing.
 
 ```{r}
 buzzfeed[c(8,153),]
@@ -269,31 +265,7 @@ plot(lasso_model_no_source, xlim=c(0, .3))
 
 ## Part 3: Summarize
 
-Looking at relationships between predictors and types
-```{r warning=FALSE}
-#Doesn't seem to be a good predictor
-
-
-buzzfeed %>% 
-  ggplot(aes(x=secondary_sentiment_value, fill = type, alpha = 0.5))+
-  geom_density()+
-  facet_wrap(~secondary_sentiment)+
-  xlim(0,60)
-
-buzzfeed %>% 
-  ggplot(aes(x=readability_score, fill=type, alpha=0.5))+
-  geom_density()
-
-buzzfeed %>% 
-  ggplot(aes(x=unique_word_percent, fill=type, alpha=0.5))+
-  geom_density()
-
-
-buzzfeed %>% 
-  ggplot(aes(x=author_count, fill=type, alpha=0.5))+
-  geom_density()
-```
-
+After analyzing our data and looking at the results, we can conclude that some of the best predictors for our model included source, exclamation ratio in the text and title, authors, and surprise sentiment. Some of the worst predictors included the four sentiment predictors: primary and secondary sentiment and sentiment strength. The predictors that did not lean in either direction include `readability_score`, `unique_word_percent`, and `author_count` because they weren't disjoint and there was some overlap but not complete overlap between real and fake articles.
 
 ```{r}
 buzzfeed %>% 
@@ -302,10 +274,9 @@ buzzfeed %>%
   theme(axis.text.x = element_text(angle = 90))+
   scale_y_continuous(breaks = scales::pretty_breaks(10))+
   labs(x="Source", y="Count",  fill= "Type", title="Number of Real vs Fake articles by source")
-
 ```
 
-We can see from the plot above that there is very little overlap of real and fake news for each source.  This makes it an extremely good predictor.
+We can see from the plot above that there is very little overlap of real and fake news for each source. This makes it an extremely good predictor.
 
 We can also see that the exclamation ratios are useful predictors because they have little overlap across real and fake articles.
 
@@ -323,8 +294,10 @@ eration_title <- buzzfeed %>%
 gridExtra::grid.arrange(eratio, eration_title)
 ```
 
+When looking at sentiment analysis, we see that the strength and type of primary sentiment are not very useful *except* in the case of surprise.  Surprise is only encountered in real articles, making it a good predictor of article type.
 
-When looking at sentiment analysis, we see that the strength and type of primary sentiment are not very useful *except* in the case of surprise.  Surprise is only encountered in `real` articles, making it a good predictor of article type.
+MAKE COMMENT ABOUT HOW IT IS NOT USEFUL WITH SOURCE BUT NOT WITHOUT SOURCE
+
 ```{r}
 buzzfeed %>% 
   ggplot(aes(x=primary_sentiment_value, fill = type, alpha = 0.5))+
@@ -338,19 +311,7 @@ buzzfeed %>%
   facet_wrap(~primary_sentiment)
 ```
 
-
-\
-\
-\
-\
-\
-\
-
-## Appendix
-
-
-
-
+TALK ABOUT SPECIFICITY AND MAKE CONCLUDING COMMENT ABOUT THE GOOD PREDICTORS
 
 
 \
