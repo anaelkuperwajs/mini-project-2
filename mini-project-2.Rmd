@@ -36,7 +36,6 @@ buzzfeed <- buzzfeed %>%
          text = as.character(text),
          url = as.character(url))
 
-'%!in%' <- function(x, y)!('%in%'(x,y))
 ```
 
 
@@ -186,15 +185,94 @@ Similar to any analytical method, text analysis has it's drawbacks. One drawback
 
 ## Part 2: Analyze
 
-When training our model, we don't want to include `text`, `title`, or `url` because they are unique to each article and therefore will not make good predictors.
+
+LASSO with source
+```{r}
+set.seed(253)
+lambda_grid <- 10^seq(-3, 1, length = 100)
+
+lasso_model <- train(
+    type ~ .,
+    data = buzzfeed %>% select(-text, -title, -url),
+    method = "glmnet",
+    tuneGrid = data.frame(alpha = 1, lambda = lambda_grid),
+    trControl = trainControl(method = "cv", number = 10, selectionFunction = "best"),
+    metric = "Accuracy",
+    na.action = na.omit
+)
+
+lasso_model$results %>% filter(lambda == lasso_model$bestTune$lambda)
+coef(lasso_model$finalModel, lasso_model$bestTune$lambda)
+
+
+predict_data <- na.omit(lasso_model$trainingData)
+classifications <- predict(lasso_model, newdata = predict_data, type = "raw")
+head(classifications, 3)
+
+
+confusionMatrix(data = classifications, 
+  reference = predict_data$.outcome, 
+  positive = "real")
+```
+
+LASSO without source
+```{r}
+set.seed(253)
+lambda_grid <- 10^seq(-3, 1, length = 100)
+
+lasso_model_no_source <- train(
+    type ~ .,
+    data = buzzfeed %>% select(-text, -title, -url, -source),
+    method = "glmnet",
+    tuneGrid = data.frame(alpha = 1, lambda = lambda_grid),
+    trControl = trainControl(method = "cv", number = 10, selectionFunction = "best"),
+    metric = "Accuracy",
+    na.action = na.omit
+)
+
+lasso_model_no_source$results %>% filter(lambda == lasso_model_no_source$bestTune$lambda)
+coef(lasso_model_no_source$finalModel, lasso_model_no_source$bestTune$lambda)
+
+
+predict_data_no_source <- na.omit(lasso_model_no_source$trainingData)
+classifications <- predict(lasso_model_no_source, newdata = predict_data, type = "raw")
+head(classifications, 3)
+
+
+confusionMatrix(data = classifications, 
+  reference = predict_data$.outcome, 
+  positive = "real")
+```
+
+To build our model, we first looked at the relationships between predictors and types of article. We then tried a variety of techniques to get a sense of which might do the best job of predicting if the articles are real or fake.  We thought about KNN and GAM, but GAM did not do well with so much text and KNN does not do so well with so many predictors, so we moved on to parametric algorithms.
+
+We chose LASSO with binary classification because simple logistic regression tried to use all of the predictors with no penalties and did not do as good of a job making accurate predictions. We did not try backwards stepwise or best subset selection because they are more computationally expensive.  LASSO had a very high accuracy and high specificity so we moved forward with LASSO.
+
+From here we made two models -- one that includes `source` and one that does not. We did this because source significantly affects accuracy.  If we were to try classifying an article with no source, the accuracy would be lower and the model would be different. When training our model, we excluded `text`, `title`, and `url` from the data because they are unique to each article and therefore do not make useful predictors.
+
+For our models, we used a broad range of lambda values to get a better understanding of what size of penalty yielded the highest accuracy.  We chose `best`, because for a topic like fake news with potentialy impactful consequences, it is important to be as accurate as possible.
 
 ```{r}
+plot(lasso_model, xlim=c(0, .3))
+plot(lasso_model_no_source, xlim=c(0, .3))
+```
+
+
+\
+\
+\
+\
+\
+\
+
+
+
+## Part 3: Summarize
+
+Looking at relationships between predictors and types
+```{r warning=FALSE}
 #Doesn't seem to be a good predictor
-buzzfeed %>% 
-  ggplot(aes(x=primary_sentiment_value, fill = type, alpha = 0.5))+
-  geom_density()+
-  facet_wrap(~primary_sentiment)+
-  xlim(0,60)
+
 
 buzzfeed %>% 
   ggplot(aes(x=secondary_sentiment_value, fill = type, alpha = 0.5))+
@@ -210,13 +288,6 @@ buzzfeed %>%
   ggplot(aes(x=unique_word_percent, fill=type, alpha=0.5))+
   geom_density()
 
-buzzfeed %>% 
-  ggplot(aes(x=exclamation_ratio, fill=type, alpha=0.5))+
-  geom_density()
-
-buzzfeed %>% 
-  ggplot(aes(x=exclamation_ratio_title, fill=type, alpha=0.5))+
-  geom_density()
 
 buzzfeed %>% 
   ggplot(aes(x=author_count, fill=type, alpha=0.5))+
@@ -225,81 +296,47 @@ buzzfeed %>%
 
 
 ```{r}
-# Pretty good 
-set.seed(253)
-lambda_grid <- 10^seq(-3, 1, length = 100)
-
-# Perform LASSO
-lasso_model <- train(
-    type ~ .,
-    data = buzzfeed %>% select(-text, -title, -url),
-    method = "glmnet",
-    tuneGrid = data.frame(alpha = 1, lambda = lambda_grid),
-    trControl = trainControl(method = "cv", number = 10, selectionFunction = "best"),
-    metric = "MAE",
-    na.action = na.omit
-)
-
-lasso_model$results %>% filter(lambda == lasso_model$bestTune$lambda)
-
-coef(lasso_model$finalModel, lasso_model$bestTune$lambda)
+buzzfeed %>% 
+  ggplot(aes(x = source, fill= type))+
+  geom_bar()+ 
+  theme(axis.text.x = element_text(angle = 90))+
+  scale_y_continuous(breaks = scales::pretty_breaks(10))+
+  labs(x="Source", y="Count",  fill= "Type", title="Number of Real vs Fake articles by source")
 
 ```
 
+We can see from the plot above that there is very little overlap of real and fake news for each source.  This makes it an extremely good predictor.
+
+We can also see that the exclamation ratios are useful predictors because they have little overlap across real and fake articles.
 
 ```{r}
-# GAM doesn't like the source or url because of the backslashes
+eratio <- buzzfeed %>% 
+  ggplot(aes(x=exclamation_ratio, fill=type, alpha=0.5))+
+  geom_density()+
+  labs(x="Exclamation Ratio in Body", fill="Type")
 
-gam_model <- train(
-  type ~ .,
-  data = buzzfeed %>% select(-text, -title, -url, -source),
-  method = "gamLoess",
-  tuneGrid = data.frame(span = seq(0.2, 0.6, 0.1), degree = 1),
-  trControl = trainControl(method = "cv", number = 10, selectionFunction = "oneSE"),
-  metric = "Accuracy",
-  na.action = na.omit
-)
+eration_title <- buzzfeed %>% 
+  ggplot(aes(x=exclamation_ratio_title, fill=type, alpha=0.5))+
+  geom_density()+
+  labs(x="Exclamation Ratio in Title", fill="Type")
 
-plot(gam_model)
-gam_model$resample
+gridExtra::grid.arrange(eratio, eration_title)
 ```
 
 
+When looking at sentiment analysis, we see that the strength and type of primary sentiment are not very useful *except* in the case of surprise.  Surprise is only encountered in `real` articles, making it a good predictor of article type.
 ```{r}
-#Not great and hard to use
+buzzfeed %>% 
+  ggplot(aes(x=primary_sentiment_value, fill = type, alpha = 0.5))+
+  geom_density()+
+  facet_wrap(~primary_sentiment)+
+  xlim(0,60)
 
-# Set the seed
-set.seed(253)
-
-# Run the model
-# using variables chosen from lasso
-logistic_model <- train(
-    type ~ .,
-    data = buzzfeed %>% select(authors, source, exclamation_ratio_title, type, primary_sentiment, secondary_sentiment),
-    method = "glm",
-    family = "binomial",
-    trControl = trainControl(method = "cv", number = 10),
-    metric = "Accuracy",
-    na.action = na.omit
-)
-
-# Summarize the model
-logistic_model$results
+buzzfeed %>% 
+  ggplot(aes(x=type, fill = type))+
+  geom_bar()+
+  facet_wrap(~primary_sentiment)
 ```
-
-
-\
-\
-\
-\
-\
-\
-
-
-
-## Part 3: Summarize
-
-
 
 
 \

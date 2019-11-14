@@ -86,3 +86,5 @@ max_sentiment_type <- function(text, n){
   
 }
 
+'%!in%' <- function(x, y)!('%in%'(x,y))
+
