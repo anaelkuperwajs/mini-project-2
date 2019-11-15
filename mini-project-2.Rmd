@@ -265,7 +265,7 @@ plot(lasso_model_no_source, xlim=c(0, .3))
 
 ## Part 3: Summarize
 
-After analyzing our data and looking at the results, we can conclude that some of the best predictors for our model included source, exclamation ratio in the text and title, authors, and surprise sentiment. Some of the worst predictors included the four sentiment predictors: primary and secondary sentiment and sentiment strength. The predictors that did not lean in either direction include `readability_score`, `unique_word_percent`, and `author_count` because they weren't disjoint and there was some overlap but not complete overlap between real and fake articles.
+After analyzing our data and looking at the results, we can conclude that some of the best predictors for our model included source, exclamation ratio in the text and title, authors, and surprise sentiment. Some of the worst predictors included the four sentiment predictors: primary and secondary sentiment and sentiment strength. The predictors that did not lean in either direction include `readability_score`, `unique_word_percent`, and `author_count` because they weren't disjoint and there was some overlap but not complete overlap between real and fake articles. We did, however, have two different models, one with source and one without source as a predictor. Both are very accurate, but when taking source out as a predictor, sentiment becomes a better predictor.
 
 ```{r}
 buzzfeed %>% 
@@ -294,9 +294,7 @@ eration_title <- buzzfeed %>%
 gridExtra::grid.arrange(eratio, eration_title)
 ```
 
-When looking at sentiment analysis, we see that the strength and type of primary sentiment are not very useful *except* in the case of surprise.  Surprise is only encountered in real articles, making it a good predictor of article type.
-
-MAKE COMMENT ABOUT HOW IT IS NOT USEFUL WITH SOURCE BUT NOT WITHOUT SOURCE
+When looking at sentiment analysis, we see that the strength and type of primary sentiment are not very useful *except* in the case of surprise.  Surprise is only encountered in real articles, making it a good predictor of article type. As mentioned before, this fact changes if source is removed as a predictor. When that happens, sentiment becomes an important predictor.
 
 ```{r}
 buzzfeed %>% 
@@ -311,7 +309,7 @@ buzzfeed %>%
   facet_wrap(~primary_sentiment)
 ```
 
-TALK ABOUT SPECIFICITY AND MAKE CONCLUDING COMMENT ABOUT THE GOOD PREDICTORS
+Overall, source and author are two of the most indicative predictors. From the predictors we created, the exclamation ratio in both the text and the title and the sentiment analysis when source is removed play an important role in categorizing the article. The LASSO model we created from these predictors was extremely accurate, with or without source as a predictor. Furthermore, the specificty was extremely high. With source as a predictor, specificity is at 100%. Without source as a predictor, specificity is approximately 97%. Both values are extremely high, which is very important for this task. For categorizing an article as fake or real news, it is more important to have a high specificity because it is better to accurately know which articles are fake, rather than accidentally categorize an article as real news. Lastly, the sensitivity is also high, 77% and 90%, which is also very high for this model. Overall, as seen from our predictors and the sensitivity and specificty values, it is easier to categorize a fake article than a real article, yet both are fairly detectable given some of our best predictors.
 
 
 \
