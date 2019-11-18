@@ -65,70 +65,68 @@ Our new predictors will be:
 - Strength of secondary sentiment
 
 
-Making `total_words`...
+Making `total_words`
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(total_words = str_count(text, " ") + 1)
 ```
 
-
+Making `total_words_title`
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(total_words_title = str_count(title, " ") + 1)
 ```
 
-Making `total_upper_case_words`...
+Making `total_upper_case_words`
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(total_upper_case_words = str_count(text, "\\b[A-Z]{2,}\\b"))
 ```
 
-Making `total_upper_case_words_title`...
-
-Making `upper_case_word_ratio_title`...
+Making `total_upper_case_words_title` and `upper_case_word_ratio_title`
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(total_upper_case_words_title = str_count(title, "\\b[A-Z]{2,}\\b"),
          upper_case_word_ratio_title = total_upper_case_words_title/total_words_title)
 ```
 
-Making `exclamation_ratio`...
+Making `exclamation_ratio`
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(exclamation_ratio = exclamation_ratio(text))
 ```
 
-Making `exclamation_ratio_title`...
+Making `exclamation_ratio_title`
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(exclamation_ratio_title = exclamation_ratio(title))
 ```
 
-Making `total_sentences`...
+Making `total_sentences`
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(total_sentences = nsentence(text))
 ```
 
-Making `total_syllables`...
+Making `total_syllables`
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(total_syllables = nsyllable(text))
 ```
 
-Making `unique_word_percent`...
+Making `unique_word_percent`
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(unique_word_percent = pct_unique_words(text, total_words))
 ```
 
-Making `readability_score`...
+Making `readability_score`
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(readability_score = flesch_reading_ease(total_words, total_sentences, total_syllables))
 ```
 
-Making `author_count`...
+Making `author_count`
 ```{r}
 buzzfeed <- buzzfeed %>%
   mutate(authors = gsub("View All Posts,", "", authors)) %>%
@@ -151,13 +149,7 @@ buzzfeed <- buzzfeed %>%
   mutate(author_count = if_else(authors == "None", 0, author_count))
 ```
 
-Making `primary_sentiment`...
-
-Making `secondary_sentiment`...
-
-Making `primary_sentiment_value`...
-
-Making `secondary_sentiment_value`...
+Making `primary_sentiment`, `secondary_sentiment`, `primary_sentiment_value`, and `secondary_sentiment_value`
 ```{r cache=TRUE}
 buzzfeed <- buzzfeed %>% 
   rowwise() %>% 
