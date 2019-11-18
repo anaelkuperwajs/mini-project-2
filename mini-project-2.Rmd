@@ -1,7 +1,6 @@
 ---
 title: "Mini-Project 2: Adventure 1"
 author: Anael Kuperwajs Cohen, Juliet Kelson
-css: style.css
 output: 
   html_document:
     toc: true
@@ -9,7 +8,6 @@ output:
     code_folding: hide
 ---
 
-<script src="OutputFolding.js"></script>
 
 ```{r, echo=FALSE, include=FALSE, warning=FALSE}
 knitr::opts_chunk$set(out.extra = 'class="plot"')
@@ -168,8 +166,10 @@ buzzfeed[c(8,153),] %>%
   kable_styling() %>%
   scroll_box(width = "100%", height = "200px")
 ```
-/
-/
+
+\
+\
+\
 
 The two sources that will be presented in order to demonstrate our new predictors include "Jeb Bush to lecture at Harvard this fall" -- the real sample article -- and "Hillary's DEAD!?!? Brand New Theory Has Serious PROOF" --  the fake article. 
 We first started by looking at predictors relating to word and punctuation counts in the text itself and the title. Our first predictors looked at the word count and upper-case word count in the text and the title. The total number of words for the title and the text were not significantly different between these two articles. The number of words in the titles is exactly the same, and the word count in the body only differs by 50.
@@ -202,7 +202,7 @@ Similar to any analytical method, text analysis has it's drawbacks. One drawback
 
 
 LASSO with source
-<div class="fold o">
+
 ```{r}
 set.seed(253)
 lambda_grid <- 10^seq(-3, 1, length = 100)
@@ -216,24 +216,11 @@ lasso_model <- train(
     metric = "Accuracy",
     na.action = na.omit
 )
-
-lasso_model$results %>% filter(lambda == lasso_model$bestTune$lambda)
-coef(lasso_model$finalModel, lasso_model$bestTune$lambda)
-
-
-predict_data <- na.omit(lasso_model$trainingData)
-classifications <- predict(lasso_model, newdata = predict_data, type = "raw")
-head(classifications, 3)
-
-
-confusionMatrix(data = classifications, 
-  reference = predict_data$.outcome, 
-  positive = "real")
 ```
-</div>
+
 
 LASSO without source
-<div class="fold o">
+
 ```{r}
 set.seed(253)
 lambda_grid <- 10^seq(-3, 1, length = 100)
@@ -247,21 +234,8 @@ lasso_model_no_source <- train(
     metric = "Accuracy",
     na.action = na.omit
 )
-
-lasso_model_no_source$results %>% filter(lambda == lasso_model_no_source$bestTune$lambda)
-coef(lasso_model_no_source$finalModel, lasso_model_no_source$bestTune$lambda)
-
-
-predict_data_no_source <- na.omit(lasso_model_no_source$trainingData)
-classifications <- predict(lasso_model_no_source, newdata = predict_data, type = "raw")
-head(classifications, 3)
-
-
-confusionMatrix(data = classifications, 
-  reference = predict_data$.outcome, 
-  positive = "real")
 ```
-</div>
+
 
 To build our model, we first looked at the relationships between predictors and types of article. We then tried a variety of techniques to get a sense of which might do the best job of predicting if the articles are real or fake.  We thought about KNN and GAM, but GAM did not do well with so much text and KNN does not do so well with so many predictors, so we moved on to parametric algorithms.
 
@@ -359,6 +333,61 @@ Overall, `source` and `author` are two of the most indicative predictors. From t
 \
 \
 
+
 ## Part 4: Contributions
 
 Both members evenly contributed to this project. We came up with the new predictors together and each implemented half of them. The rest was done together.
+
+\
+\
+\
+
+
+## Appendix
+
+
+\
+\
+\
+
+
+#### LASSO model summary data with `source`
+
+```{r}
+lasso_model$results %>% filter(lambda == lasso_model$bestTune$lambda)
+coef(lasso_model$finalModel, lasso_model$bestTune$lambda)
+
+
+predict_data <- na.omit(lasso_model$trainingData)
+classifications <- predict(lasso_model, newdata = predict_data, type = "raw")
+head(classifications, 3)
+
+
+confusionMatrix(data = classifications, 
+  reference = predict_data$.outcome, 
+  positive = "real")
+```
+
+\
+\
+\
+
+
+
+#### LASSO model summary data without `source`
+
+```{r}
+lasso_model_no_source$results %>% filter(lambda == lasso_model_no_source$bestTune$lambda)
+coef(lasso_model_no_source$finalModel, lasso_model_no_source$bestTune$lambda)
+
+
+predict_data_no_source <- na.omit(lasso_model_no_source$trainingData)
+classifications <- predict(lasso_model_no_source, newdata = predict_data, type = "raw")
+head(classifications, 3)
+
+
+confusionMatrix(data = classifications, 
+  reference = predict_data$.outcome, 
+  positive = "real")
+```
+
