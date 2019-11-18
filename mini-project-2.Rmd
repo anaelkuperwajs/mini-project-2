@@ -1,6 +1,7 @@
 ---
 title: "Mini-Project 2: Adventure 1"
 author: Anael Kuperwajs Cohen, Juliet Kelson
+css: style.css
 output: 
   html_document:
     toc: true
@@ -8,8 +9,10 @@ output:
     code_folding: hide
 ---
 
+<script src="OutputFolding.js"></script>
 
-```{r}
+```{r, echo=FALSE, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(out.extra = 'class="plot"')
 library(dplyr)
 library(ggplot2)
 library(caret)
@@ -17,6 +20,7 @@ library(stringr)
 library(tidyverse)
 library(quanteda)
 library(syuzhet)
+library(kableExtra)
 source("miniProjFunctions.R")
 ```
 
@@ -43,87 +47,88 @@ buzzfeed <- buzzfeed %>%
 
 Our new predictors will be:
 
-[x] 1. Word count
-[x] 2. Word count in title
-[x] 3. Upper-case word count
-[x] 4. Upper-case word count in title
-[x] 5. Upper-case word ratio in title
-[x] 6. ! ratio (to . ?)
-[x] 7. ! ratio (to . ?) in title
-[x] 8. Sentence Count
-[x] 9. Syllables
-[x] 10. % Unique words
-[x] 11. Flesch–Kincaid grade level
-[x] 12. Author Count
-[x] 13. Primary sentiment
-[x] 14. Secondary sentiment
-[x] 15. Strength of primary sentiment
-[x] 16. Strength of secondary sentiment
+- Word count
+- Word count in title
+- Upper-case word count
+- Upper-case word count in title
+- Upper-case word ratio in title
+- ! ratio (to . ?)
+- ! ratio (to . ?) in title
+- Sentence Count
+- Syllables
+- % Unique words
+- Flesch–Kincaid grade level
+- Author Count
+- Primary sentiment
+- Secondary sentiment
+- Strength of primary sentiment
+- Strength of secondary sentiment
 
 
-1. Word Count
+Making `total_words`...
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(total_words = str_count(text, " ") + 1)
 ```
 
-2. Word count in title
+
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(total_words_title = str_count(title, " ") + 1)
 ```
 
-3. Upper-case word count
+Making `total_upper_case_words`...
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(total_upper_case_words = str_count(text, "\\b[A-Z]{2,}\\b"))
 ```
 
-4. Upper-case word count in title
-5. Upper-case word ratio in title
+Making `total_upper_case_words_title`...
+
+Making `upper_case_word_ratio_title`...
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(total_upper_case_words_title = str_count(title, "\\b[A-Z]{2,}\\b"),
          upper_case_word_ratio_title = total_upper_case_words_title/total_words_title)
 ```
 
-6. ! ratio (to . ?)
+Making `exclamation_ratio`...
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(exclamation_ratio = exclamation_ratio(text))
 ```
 
-7. ! ratio (to . ?) in title
+Making `exclamation_ratio_title`...
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(exclamation_ratio_title = exclamation_ratio(title))
 ```
 
-8. Sentence Count
+Making `total_sentences`...
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(total_sentences = nsentence(text))
 ```
 
-9. Syllables
+Making `total_syllables`...
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(total_syllables = nsyllable(text))
 ```
 
-10. % Unique words
+Making `unique_word_percent`...
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(unique_word_percent = pct_unique_words(text, total_words))
 ```
 
-11. Flesch–Kincaid grade level
+Making `readability_score`...
 ```{r}
 buzzfeed <- buzzfeed %>% 
   mutate(readability_score = flesch_reading_ease(total_words, total_sentences, total_syllables))
 ```
 
-12. Author Count
+Making `author_count`...
 ```{r}
 buzzfeed <- buzzfeed %>%
   mutate(authors = gsub("View All Posts,", "", authors)) %>%
@@ -146,10 +151,13 @@ buzzfeed <- buzzfeed %>%
   mutate(author_count = if_else(authors == "None", 0, author_count))
 ```
 
-13. Primary sentiment
-14. Secondary sentiment
-15. Strength of primary sentiment
-16. Strength of secondary sentiment
+Making `primary_sentiment`...
+
+Making `secondary_sentiment`...
+
+Making `primary_sentiment_value`...
+
+Making `secondary_sentiment_value`...
 ```{r cache=TRUE}
 buzzfeed <- buzzfeed %>% 
   rowwise() %>% 
@@ -160,14 +168,33 @@ buzzfeed <- buzzfeed %>%
          )
 ```
 
-```{r}
-buzzfeed[c(8,153),]
+
+```{r echo = TRUE}
+buzzfeed[c(8,153),] %>% 
+  select(-text) %>% 
+  kable() %>%
+  kable_styling() %>%
+  scroll_box(width = "100%", height = "200px")
 ```
+/
+/
 
 The two sources that will be presented in order to demonstrate our new predictors include "Jeb Bush to lecture at Harvard this fall" -- the real sample article -- and "Hillary's DEAD!?!? Brand New Theory Has Serious PROOF" --  the fake article. 
-We first started by looking at predictors relating to word and punctuation counts in the text itself and the title. Our first predictors looked at the word count and upper-case word count in the text and the title. The total number of words for the title and the text were not significantly different between these two articles. The number of words in the title is exactly the same and the word count in the text is greater for the fake article, but only by 50 words. The total number of upper-case words in the text is also similar in both articles, one in the real article and two in the fake, however the difference in the number of upper-case words is more drastic in the title. There are zero upper-case words in the real title and two in the fake article, which is out of eight total words in the title. Two out of eight words is 25%, as seen in the ratio predictor for upper-case words in the title. The next two predictors looked at the ratio of exclamation points to question marks and periods in the text and title. In the text, there are zero exclamation points in real article, yet about 47% in the fake article. Furthermore, in the title there are zero exclamation points in the real article but they make up 50% of the punctuation in the fake article. This shows that exclamation points are used way more freely in the fake article, rather than the real article. Just like word count, we also looked at sentence and syllable count. These two measurements were fairly insignificant as the numbers were similar in both sentences. It was slightly surprising, however, that there were more sentences and syllables in the fake news article than the real one. The next two predictors analyzed the words that were used in the text. The first is the percent of unique words, which was much higher for the real article, 112.75% vs 87.10%. The second is a readability score, where the higher the percent the easier the text is to read because it is meant for a younger audience. The real article has a readability score of 23.34, which matches with a school reading level of a college graduate. On the other hand, the fake article has a score of 48.71, which aligns with a school reading level of a college student. While this may not seem like a huge difference, the idea is that the structure of the article is much more complex the lower the score. Fake articles often don't have that same complexity. The next predictor is about the author count, which is equal in this case between the two articles with one author. It does not make a big difference in this comparison. Finally, the last four predictors are about sentiment analysis. We looked at the primary and secondary sentiment in the text and the strength of that sentiment. The primary sentiment is the strongest sentiment in the text and the secondy sentiment is the one with the second highest score. The sentiments for the real article are trust and positive, with scores in the 30s, while the fake article has the sentiments negative and positive with low scores of 16 each. The fact that the primary and secondary sentiments conflict with each other greatly is something to be concerned about when thinking of the validity of an article.
+We first started by looking at predictors relating to word and punctuation counts in the text itself and the title. Our first predictors looked at the word count and upper-case word count in the text and the title. The total number of words for the title and the text were not significantly different between these two articles. The number of words in the titles is exactly the same, and the word count in the body only differs by 50.
 
-Similar to any analytical method, text analysis has it's drawbacks. One drawback, for example, is seen clearly through the sentiment analysis predictors. We will not always be able to accurately analyze the sentiment of text. Computers and algorithms can't always detect sarcasm, understand references or allusions, and won't always correctly analyze basic sentiments such as `positive` or `negative`. Additionally, writing algorithms to detect factors like writing style, words with multiple meanings, correct grammar/puntuation, and correctness of fact is often difficult, innacurate, or impossible.  All of that being said, text analysis is still a beneficial and important research tool.
+The total number of upper-case words in the text is also similar in both articles: one in the real article and two in the fake. However, the difference in the number of upper-case words is more drastic in the title. There are zero upper-case words in the real title whereas two out of eight words in the fake title are uppercase. We also capture this as a ratio. For the fake title, two out of eight words is 25%, as seen in the ratio predictor for upper-case words in the title. 
+
+The next two predictors looked at the ratio of exclamation points to question marks and periods in the text and title. In the text, there are zero exclamation points in real article, yet about 47% of sentence ending punctuation (.?!) in the fake article is made up of exclamations. Furthermore, in the title there are zero exclamation points in the real article but they make up 50% of the punctuation in the fake article. This shows that exclamation points are used way more freely in the fake article, rather than the real article. 
+
+Just like word count, we also looked at sentence and syllable count. These two measurements were fairly insignificant as the numbers were similar in both sentences. It was slightly surprising, however, that there were more sentences and syllables in the fake news article than the real one. 
+
+The next two predictors analyzed the words that were used in the text. The first is the percent of unique words, which was much higher for the real article, 64% vs 76%. The second is a readability score, where higher score implies the text is easier to read. Texts with high scores can be read by a younger audience. The real article has a readability score of 23.34, which matches with a school reading level of a college *graduate*. On the other hand, the fake article has a score of 48.71, which aligns with a school reading level of a college *student*. While this may not seem like a huge difference, the idea is that the structure of the article is much more complex the lower the score. Fake articles often don't have that same complexity. 
+
+The next predictor is about the author count, which is equal in this case between the two articles. It does not make a big difference in this comparison. 
+
+Finally, the last four predictors are about sentiment analysis. We looked at the primary and secondary sentiment in the text and the strength of each sentiment. The primary sentiment is the strongest sentiment in the text and the secondy sentiment is the one with the second highest where strength is calculated by total sentences containing the sentiment. The sentiments for the real article are `trust` and `positive`, with scores in the 30s, while the fake article has the sentiments `negative` and `positive` with low scores of 16 each. The fact that the primary and secondary sentiments conflict with each other greatly is something to be concerned about when thinking of the validity of an article.
+
+Similar to any analytical method, text analysis has it's drawbacks. One drawback, for example, is seen through the sentiment analysis predictors. We will not always be able to accurately analyze the sentiment of text. Computers and algorithms can't always detect sarcasm, understand references or allusions, and won't always correctly analyze basic sentiments such as `positive` or `negative`. Additionally, writing algorithms to detect factors like writing style, words with multiple meanings, correct grammar/puntuation, and correctness of fact is often difficult, innacurate, or impossible.  All of that being said, text analysis is still a beneficial and important research tool.
 
 
 \
@@ -183,6 +210,7 @@ Similar to any analytical method, text analysis has it's drawbacks. One drawback
 
 
 LASSO with source
+<div class="fold o">
 ```{r}
 set.seed(253)
 lambda_grid <- 10^seq(-3, 1, length = 100)
@@ -210,8 +238,10 @@ confusionMatrix(data = classifications,
   reference = predict_data$.outcome, 
   positive = "real")
 ```
+</div>
 
 LASSO without source
+<div class="fold o">
 ```{r}
 set.seed(253)
 lambda_grid <- 10^seq(-3, 1, length = 100)
@@ -239,6 +269,7 @@ confusionMatrix(data = classifications,
   reference = predict_data$.outcome, 
   positive = "real")
 ```
+</div>
 
 To build our model, we first looked at the relationships between predictors and types of article. We then tried a variety of techniques to get a sense of which might do the best job of predicting if the articles are real or fake.  We thought about KNN and GAM, but GAM did not do well with so much text and KNN does not do so well with so many predictors, so we moved on to parametric algorithms.
 
@@ -246,13 +277,19 @@ We chose LASSO with binary classification because simple logistic regression tri
 
 From here we made two models -- one that includes `source` and one that does not. We did this because source significantly affects accuracy.  If we were to try classifying an article with no source, the accuracy would be lower and the model would be different. When training our model, we excluded `text`, `title`, and `url` from the data because they are unique to each article and therefore do not make useful predictors.
 
-For our models, we used a broad range of lambda values to get a better understanding of what size of penalty yielded the highest accuracy.  We chose `best`, because for a topic like fake news with potentialy impactful consequences, it is important to be as accurate as possible.
+For our models, we used a broad range of lambda ($\lambda$) values to get a better understanding of what size of penalty yielded the highest accuracy.  We chose `best`, because for a topic like fake news with potentialy impactful consequences, it is important to be as accurate as possible.
 
+
+LASSO $\lambda$ with source
 ```{r}
 plot(lasso_model, xlim=c(0, .3))
-plot(lasso_model_no_source, xlim=c(0, .3))
 ```
 
+
+LASSO $\lambda$ without source
+```{r}
+plot(lasso_model_no_source, xlim=c(0, .3))
+```
 
 \
 \
@@ -271,45 +308,56 @@ After analyzing our data and looking at the results, we can conclude that some o
 buzzfeed %>% 
   ggplot(aes(x = source, fill= type))+
   geom_bar()+ 
+  theme_minimal()+
   theme(axis.text.x = element_text(angle = 90))+
   scale_y_continuous(breaks = scales::pretty_breaks(10))+
-  labs(x="Source", y="Count",  fill= "Type", title="Number of Real vs Fake articles by source")
+  labs(x="Source", y="Count",  fill= "Type", title="Count of Real vs Fake articles by source")
 ```
 
 We can see from the plot above that there is very little overlap of real and fake news for each source. This makes it an extremely good predictor.
 
 We can also see that the exclamation ratios are useful predictors because they have little overlap across real and fake articles.
 
-```{r}
+```{r warning=FALSE}
 eratio <- buzzfeed %>% 
-  ggplot(aes(x=exclamation_ratio, fill=type, alpha=0.5))+
-  geom_density()+
-  labs(x="Exclamation Ratio in Body", fill="Type")
+  ggplot(aes(x=exclamation_ratio, fill=type))+
+  geom_density(alpha=0.5)+
+  labs(x="Exclamation Ratio in Body", fill="Type", y = "Density")+
+  theme_minimal()
 
 eration_title <- buzzfeed %>% 
-  ggplot(aes(x=exclamation_ratio_title, fill=type, alpha=0.5))+
-  geom_density()+
-  labs(x="Exclamation Ratio in Title", fill="Type")
+  ggplot(aes(x=exclamation_ratio_title, fill=type))+
+  geom_density(alpha=0.5)+
+  labs(x="Exclamation Ratio in Title", fill="Type", y = "Density")+
+  theme_minimal()
 
 gridExtra::grid.arrange(eratio, eration_title)
 ```
 
 When looking at sentiment analysis, we see that the strength and type of primary sentiment are not very useful *except* in the case of surprise.  Surprise is only encountered in real articles, making it a good predictor of article type. As mentioned before, this fact changes if source is removed as a predictor. When that happens, sentiment becomes an important predictor.
 
-```{r}
+```{r, warning=FALSE}
 buzzfeed %>% 
-  ggplot(aes(x=primary_sentiment_value, fill = type, alpha = 0.5))+
-  geom_density()+
+  ggplot(aes(x=primary_sentiment_value, fill = type))+
+  geom_density(alpha = 0.5)+
   facet_wrap(~primary_sentiment)+
-  xlim(0,60)
+  xlim(0,60)+
+  theme_minimal()+
+  labs(x = "Primary Sentiment Value", y = "Density", fill = "Type")+
+  theme(legend.direction = 'horizontal', legend.position=c(.8,.2))
+  
 
 buzzfeed %>% 
   ggplot(aes(x=type, fill = type))+
   geom_bar()+
-  facet_wrap(~primary_sentiment)
+  facet_grid(~primary_sentiment)+
+  theme_minimal()+
+  labs(x = "Type", y = "Count", title = "Primary Sentiment Type")+
+  theme(legend.position = "none")+
+  scale_y_continuous(breaks = scales::pretty_breaks())
 ```
 
-Overall, source and author are two of the most indicative predictors. From the predictors we created, the exclamation ratio in both the text and the title and the sentiment analysis when source is removed play an important role in categorizing the article. The LASSO model we created from these predictors was extremely accurate, with or without source as a predictor. Furthermore, the specificty was extremely high. With source as a predictor, specificity is at 100%. Without source as a predictor, specificity is approximately 97%. Both values are extremely high, which is very important for this task. For categorizing an article as fake or real news, it is more important to have a high specificity because it is better to accurately know which articles are fake, rather than accidentally categorize an article as real news. Lastly, the sensitivity is also high, 77% and 90%, which is also very high for this model. Overall, as seen from our predictors and the sensitivity and specificty values, it is easier to categorize a fake article than a real article, yet both are fairly detectable given some of our best predictors.
+Overall, `source` and `author` are two of the most indicative predictors. From the predictors we created, the exclamation ratio in both the text and the title play an important role in categorizing the article. When `source` is removed,  and the sentiment analysis also becomes important as a predictor. The LASSO model we created from these predictors was highly accurate with or without `source` as a predictor and the specificty was extremely high. With `source` as a predictor, specificity is at 100%. Without `source` as a predictor, specificity is approximately 97%. In both cases, specificity is high, which is very important for this task. For categorizing an article as fake or real news, it is more important to have a high specificity because it is better to accurately know which articles are fake, rather than accidentally categorize an article as real news. Lastly, the sensitivity is also high (77% and 90%) which means our models also accuratly classify articles as real. Overall, as seen from our predictors and the sensitivity and specificty values, it is easier to categorize a fake article than a real article, yet both are easily detectable.
 
 
 \

@@ -17,10 +17,10 @@ flesch_reading_ease <- function(nwords, nsentences, nsyllables){
 #'
 #' @return number of unique words
 pct_unique_words <- function(text, nwords){
-  unique = length(unique(unlist(str_split(text, ' '))))
+  unique = lengths(lapply(strsplit(text, split = ' '), unique))
   pct_unique = round(unique/nwords, 2)
   
-  return(pct_unique)
+  return(pct_unique*100)
 }
 
 #' exclamation_ratio
@@ -86,5 +86,5 @@ max_sentiment_type <- function(text, n){
   
 }
 
-'%!in%' <- function(x, y)!('%in%'(x,y))
+'%!in%' <- function(x, y){!('%in%'(x,y))}
 
